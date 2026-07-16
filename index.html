@@ -2,362 +2,1106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Quantum Origami Playground</title>
+  <title>Quantum Origami Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Colorful, fun styling -->
+
+  <!-- Plotly for 2D/3D interactive graphs -->
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+  <!-- Simple styling -->
   <style>
     :root {
-      --bg1: #1b1f3b;
-      --bg2: #ff6f61;
-      --accent1: #ffd166;
-      --accent2: #06d6a0;
-      --accent3: #118ab2;
-      --text: #f7f7ff;
+      --bg: #050816;
+      --bg-alt: #0b1024;
+      --accent: #ff6ec7;
+      --accent2: #4fd1c5;
+      --accent3: #ffd166;
+      --text: #f8f9ff;
+      --muted: #a0aec0;
+      --card: #111827;
+      --border: #2d3748;
+      --link: #63b3ed;
+      --danger: #f56565;
+      --success: #48bb78;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      --radius: 14px;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: "Poppins", system-ui, -apple-system, sans-serif;
     }
+
     body {
-      background: radial-gradient(circle at top left, var(--bg2), var(--bg1));
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1a202c 0, #050816 40%, #000 100%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
+
+    a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
     header {
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: linear-gradient(90deg, var(--accent3), var(--accent2));
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 50;
+      background: rgba(5, 8, 22, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
     }
-    header h1 {
-      font-size: 1.6rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+
+    .nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    nav a {
-      margin-left: 1rem;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 600;
-      padding: 0.4rem 0.8rem;
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-orb {
+      width: 32px;
+      height: 32px;
       border-radius: 999px;
-      transition: background 0.2s, transform 0.2s;
+      background: conic-gradient(
+        from 180deg,
+        #ff6ec7,
+        #4fd1c5,
+        #ffd166,
+        #63b3ed,
+        #ff6ec7
+      );
+      box-shadow: 0 0 18px rgba(255, 110, 199, 0.7);
+      position: relative;
+      overflow: hidden;
     }
-    nav a:hover {
-      background: rgba(0,0,0,0.15);
-      transform: translateY(-1px);
+
+    .logo-orb::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: inherit;
+      background: radial-gradient(circle at 30% 20%, #ffffff55 0, transparent 40%);
     }
+
+    .nav-title {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      color: var(--accent2);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      color: var(--muted);
+    }
+
+    .nav-links a:hover {
+      border-color: var(--accent2);
+      color: var(--text);
+      background: rgba(79, 209, 197, 0.08);
+    }
+
     main {
       flex: 1;
-      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent3);
+    }
+
+    .section-tagline {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+      background: rgba(17, 24, 39, 0.9);
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent2);
+      box-shadow: 0 0 8px rgba(79, 209, 197, 0.8);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #0b1024, #050816);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 1.1rem 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 0 0, rgba(255, 110, 199, 0.12), transparent 60%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--accent2);
+    }
+
+    .card-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .equation-block {
+      margin: 0.6rem 0;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      background: radial-gradient(circle at 20% 0, rgba(99, 179, 237, 0.18), transparent 60%);
+      border: 1px dashed rgba(99, 179, 237, 0.6);
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+    }
+
+    .equation-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent3);
+      margin-bottom: 0.25rem;
+    }
+
+    .equation-main {
+      font-size: 1rem;
+      color: var(--accent2);
+    }
+
+    .equation-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+
+    .chip {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+    }
+
+    .chip.highlight {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(255, 110, 199, 0.08);
+    }
+
+    .chip.strong {
+      border-color: var(--accent2);
+      color: var(--accent2);
+      background: rgba(79, 209, 197, 0.08);
+    }
+
+    .paper-table-wrapper {
+      margin-top: 0.6rem;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: #050816;
+    }
+
+    thead {
+      background: linear-gradient(90deg, #111827, #1a202c);
+    }
+
+    th, td {
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid #1f2933;
+      text-align: left;
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--accent3);
+      cursor: pointer;
+      position: relative;
+    }
+
+    th span.sort-indicator {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-left: 0.25rem;
+    }
+
+    tbody tr:hover {
+      background: rgba(17, 24, 39, 0.7);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .badge-primary {
+      background: rgba(79, 209, 197, 0.12);
+      color: var(--accent2);
+      border: 1px solid rgba(79, 209, 197, 0.6);
+    }
+
+    .badge-secondary {
+      background: rgba(99, 179, 237, 0.12);
+      color: var(--link);
+      border: 1px solid rgba(99, 179, 237, 0.6);
+    }
+
+    .badge-danger {
+      background: rgba(245, 101, 101, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(245, 101, 101, 0.6);
+    }
+
+    .badge-success {
+      background: rgba(72, 187, 120, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(72, 187, 120, 0.6);
+    }
+
+    .graph-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .graph-card {
+      background: #050816;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .graph-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.4rem;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    .graph-subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .graph-container {
+      width: 100%;
+      height: 220px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.4rem;
+      margin-bottom: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(17, 24, 39, 0.9);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .tab.active {
+      border-color: var(--accent2);
+      color: var(--text);
+      background: linear-gradient(90deg, #4fd1c5, #63b3ed);
+    }
+
+    .tab:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .two-column {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 2rem;
+      gap: 1.2rem;
     }
-    section {
-      background: rgba(0,0,0,0.25);
-      border-radius: 1.2rem;
-      padding: 1.5rem;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+    .timeline {
+      border-left: 2px solid rgba(148, 163, 184, 0.6);
+      padding-left: 0.9rem;
+      margin-top: 0.6rem;
     }
-    section h2 {
-      margin-bottom: 0.8rem;
-      font-size: 1.4rem;
+
+    .timeline-item {
+      margin-bottom: 0.7rem;
+      position: relative;
     }
-    section p {
-      margin-bottom: 0.6rem;
-      line-height: 1.5;
-    }
-    .tag-row {
-      margin-top: 0.8rem;
-    }
-    .tag {
-      display: inline-block;
-      margin: 0.2rem;
-      padding: 0.3rem 0.7rem;
+
+    .timeline-dot {
+      position: absolute;
+      left: -1.05rem;
+      top: 0.1rem;
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
-      background: var(--accent1);
-      color: #222;
+      background: var(--accent3);
+      box-shadow: 0 0 10px rgba(255, 209, 102, 0.9);
+    }
+
+    .timeline-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent3);
+    }
+
+    .timeline-body {
       font-size: 0.8rem;
-      font-weight: 600;
+      color: var(--muted);
+      margin-top: 0.15rem;
     }
-    /* 2D canvas area */
-    #canvas2d-wrapper {
-      margin-top: 1rem;
-      border-radius: 1rem;
-      overflow: hidden;
-      border: 2px solid var(--accent2);
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: #050816;
     }
-    #canvas2d {
-      width: 100%;
-      height: 260px;
-      display: block;
-      background: radial-gradient(circle at center, #ffffff, #ffd166);
-      cursor: pointer;
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
     }
-    /* 3D area */
-    #three-container {
-      width: 100%;
-      height: 320px;
-      border-radius: 1rem;
-      overflow: hidden;
-      border: 2px solid var(--accent3);
-      margin-top: 1rem;
+
+    .footer-links {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
     }
-    /* Links panel */
-    .links-list a {
-      display: block;
-      margin: 0.4rem 0;
-      padding: 0.5rem 0.8rem;
-      border-radius: 0.8rem;
-      background: rgba(255,255,255,0.1);
-      color: var(--accent1);
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s, transform 0.2s;
+
+    .footer-links a {
+      font-size: 0.8rem;
+      color: var(--link);
     }
-    .links-list a:hover {
-      background: rgba(255,255,255,0.25);
-      transform: translateX(3px);
-    }
-    footer {
-      padding: 1rem 2rem;
-      text-align: center;
-      font-size: 0.85rem;
-      background: rgba(0,0,0,0.4);
-    }
-    .btn-row {
-      margin-top: 1rem;
-    }
-    .btn {
-      display: inline-block;
-      margin-right: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      color: #222;
-      background: var(--accent1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .btn.alt {
-      background: var(--accent2);
-    }
-    .btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-    }
+
     @media (max-width: 900px) {
-      main {
-        grid-template-columns: 1fr;
+      .grid,
+      .graph-grid,
+      .two-column {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
       }
     }
   </style>
-  <!-- Three.js CDN for simple 3D model -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Quantum Origami Playground</h1>
-    <nav>
-      <a href="#intro">Intro</a>
-      <a href="#models">2D & 3D</a>
-      <a href="#links">Explore More</a>
-    </nav>
-  </header>
+<header>
+  <nav class="nav">
+    <div class="nav-left">
+      <div class="logo-orb"></div>
+      <div>
+        <div class="nav-title">Quantum Origami</div>
+        <div style="font-size:0.75rem;color:var(--muted);">
+          Folding geometry into quantum fields
+        </div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#universal-equation">Universal Equation</a>
+      <a href="#papers">Papers & Tables</a>
+      <a href="#graphs">Interactive Graphs</a>
+      <a href="#standard-model">Standard Model</a>
+      <a href="#cosmology">Big Bang & Inflation</a>
+    </div>
+  </nav>
+</header>
 
-  <main>
-    <!-- Left: text + 2D canvas -->
-    <section id="intro">
-      <h2>Welcome to the Fold</h2>
-      <p>
-        This interactive site is your colorful sandbox for exploring
-        <strong>origami-inspired geometry</strong>, playful visualizations, and
-        quantum-flavored ideas. Click, drag, and experiment.
-      </p>
-      <p>
-        Replace this text with your own sections—definitions, theorems, diagrams,
-        or anything from your PDF. Each panel can become a chapter in your
-        “Quantum Origami” story.
-      </p>
-      <div class="tag-row">
-        <span class="tag">Origami</span>
-        <span class="tag">Quantum</span>
-        <span class="tag">Geometry</span>
-        <span class="tag">Playground</span>
+<main>
+  <!-- Overview -->
+  <section id="overview">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Overview</div>
+        <div class="section-tagline">
+          One portal for all Quantum Origami papers, structures, and visualizations.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Interactive · Colorful · Navigable</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-title">Quantum Origami Program</div>
+        <div class="card-subtitle">
+          A unified geometric framework where folds, hinges, and moving points generate tubes, particles,
+          and full field configurations.
+        </div>
+        <p style="font-size:0.9rem;color:var(--muted);">
+          This site collects all Quantum Origami work into a single interactive hub:
+          the <strong>universal fold equation</strong>, the classification of shapes
+          (planes, tubes, circular particles, higher structures), and their mapping
+          to the <strong>Standard Model</strong> and cosmological history from the Big Bang
+          through inflation to the present universe.
+        </p>
+        <div class="chip-row">
+          <span class="chip strong">Universal formula</span>
+          <span class="chip highlight">2D → 3D tubes</span>
+          <span class="chip">Standard Model mapping</span>
+          <span class="chip">Cosmology timeline</span>
+          <span class="chip">Interactive graphs</span>
+        </div>
       </div>
 
-      <div id="canvas2d-wrapper">
-        <canvas id="canvas2d"></canvas>
+      <div class="card">
+        <div class="card-title">Quick Navigation</div>
+        <div class="card-subtitle">
+          Jump directly to the main components of the theory.
+        </div>
+        <ul style="list-style:none;font-size:0.85rem;color:var(--muted);display:grid;gap:0.35rem;">
+          <li>• <a href="#universal-equation">Universal Origami Equation</a> — core fold dynamics.</li>
+          <li>• <a href="#papers">Paper Index</a> — including <strong>thisone(1)</strong> and later work.</li>
+          <li>• <a href="#graphs">2D & 3D Graphs</a> — tubes, circular particles, and field flows.</li>
+          <li>• <a href="#standard-model">Standard Model</a> — particle-by-particle construction.</li>
+          <li>• <a href="#cosmology">Big Bang & Inflation</a> — global evolution via folds.</li>
+        </ul>
       </div>
-      <div class="btn-row">
-        <button class="btn" id="randomColorsBtn">Random Colors</button>
-        <button class="btn alt" id="spawnShapeBtn">Spawn Shape</button>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Right: 3D + links -->
-    <section id="models">
-      <h2>2D & 3D Models</h2>
-      <p>
-        On the left, the 2D canvas lets you spawn colorful folded shapes. On the
-        right, a simple 3D “origami cube” rotates in space. You can swap this out
-        for more sophisticated models later.
+  <!-- Universal Equation -->
+  <section id="universal-equation">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Universal Origami Equation</div>
+        <div class="section-tagline">
+          The fold-based formula generating all geometric and quantum structures.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Highlighted core of the theory</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Formal structure</div>
+      <div class="card-subtitle">
+        Abstract form—adapt this to your exact notation in the papers.
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">Universal Quantum Origami Equation (schematic)</div>
+        <div class="equation-main">
+          
+
+\[
+          \mathcal{O}[\Sigma, F] \;=\;
+          \sum_{i} \Phi_i\big(\gamma_i(\lambda), \kappa_i, \theta_i\big)
+          \;+\;
+          \int_{\Sigma} \mathcal{F}\big(x; F(x), \partial F(x)\big)\, \mathrm{d}^n x
+          \]
+
+
+        </div>
+        <div class="equation-note">
+          Here \(\Sigma\) is the origami surface, \(F\) encodes fold operations,
+          \(\gamma_i(\lambda)\) are moving points/hinges generating tubes and particles,
+          and \(\Phi_i\) map geometric data to quantum fields.
+        </div>
+      </div>
+
+      <p style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem;">
+        In the <strong>thisone(1)</strong> paper, this equation appears as the foundational
+        mapping from discrete folds and hinges to continuous field configurations.
+        Later papers refine the choice of \(\Phi_i\) and \(\mathcal{F}\) to match
+        gauge symmetries, mass spectra, and interaction vertices of the Standard Model.
       </p>
 
-      <div id="three-container"></div>
-
-      <h2 id="links" style="margin-top:1.5rem;">Explore More</h2>
-      <p>
-        Use these links as a hub—point to your GitHub repo, papers, simulations,
-        or external tools.
-      </p>
-      <div class="links-list">
-        <a href="https://github.com/kraiken999/index" target="_blank">
-          GitHub: Quantum Origami Project
-        </a>
-        <a href="https://threejs.org/" target="_blank">
-          Three.js Docs (for advanced 3D)
-        </a>
-        <a href="https://en.wikipedia.org/wiki/Origami" target="_blank">
-          Origami Basics
-        </a>
-        <a href="https://arxiv.org/" target="_blank">
-          arXiv: Theoretical Physics Papers
-        </a>
+      <div class="chip-row">
+        <span class="chip strong">Surface \(\Sigma\)</span>
+        <span class="chip strong">Fold field \(F\)</span>
+        <span class="chip highlight">Moving points \(\gamma_i\)</span>
+        <span class="chip">Tube & particle generation</span>
+        <span class="chip">Gauge & mass structure</span>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <footer>
-    Made with colorful chaos & structured folds. Customize me with your own content.
-  </footer>
+  <!-- Papers & Tables -->
+  <section id="papers">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Papers & Index</div>
+        <div class="section-tagline">
+          Active table of all Quantum Origami papers and their roles.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Sortable · Filterable</span>
+      </div>
+    </div>
 
-  <script>
-    // ---------- 2D CANVAS: simple interactive shapes ----------
-    const canvas = document.getElementById("canvas2d");
-    const ctx = canvas.getContext("2d");
+    <div class="card">
+      <div class="card-title">Quantum Origami Paper Index</div>
+      <div class="card-subtitle">
+        Click headers to sort; use links to navigate to specific papers or sections.
+      </div>
 
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      drawBackground();
+      <div class="paper-table-wrapper">
+        <table id="paperTable">
+          <thead>
+          <tr>
+            <th data-key="id">ID <span class="sort-indicator">⇅</span></th>
+            <th data-key="title">Title <span class="sort-indicator">⇅</span></th>
+            <th data-key="role">Role <span class="sort-indicator">⇅</span></th>
+            <th data-key="focus">Main Focus <span class="sort-indicator">⇅</span></th>
+            <th data-key="link">Link</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="badge badge-primary">thisone(1)</span></td>
+            <td>Foundations of Quantum Origami</td>
+            <td>Core framework</td>
+            <td>Universal equation, fold geometry, mapping to fields</td>
+            <td><a href="#universal-equation">View core equation</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-secondary">QO-2</span></td>
+            <td>Tubes and Circular Particles</td>
+            <td>Shape classification</td>
+            <td>Moving base points, hinge dynamics, tube formation</td>
+            <td><a href="#graphs">See tube graphs</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-success">QO-3</span></td>
+            <td>Standard Model via Origami</td>
+            <td>Particle mapping</td>
+            <td>Quarks, leptons, gauge bosons as fold configurations</td>
+            <td><a href="#standard-model">Particle table</a></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-danger">QO-4</span></td>
+            <td>Cosmology and Inflation</td>
+            <td>Global dynamics</td>
+            <td>Big Bang, inflation, structure formation via folds</td>
+            <td><a href="#cosmology">Cosmology timeline</a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Graphs -->
+  <section id="graphs">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Interactive Graphs</div>
+        <div class="section-tagline">
+          2D and 3D visualizations of folds, tubes, and particle structures.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Plotly-powered · Click to rotate</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Graph modes</div>
+      <div class="card-subtitle">
+        Switch between 2D fold diagrams and 3D tube/particle embeddings.
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-mode="2d">2D Fold Diagram</button>
+        <button class="tab" data-mode="3d">3D Tube Structure</button>
+        <button class="tab" data-mode="particle">Particle Configuration</button>
+      </div>
+
+      <div class="graph-grid">
+        <div class="graph-card">
+          <div class="graph-card-header">
+            <div class="graph-title">Fold & Hinge Geometry (2D)</div>
+            <div class="graph-subtitle">Base point motion → tube generation</div>
+          </div>
+          <div id="graph2d" class="graph-container"></div>
+        </div>
+
+        <div class="graph-card">
+          <div class="graph-card-header">
+            <div class="graph-title">Tube / Particle Embedding (3D)</div>
+            <div class="graph-subtitle">Circular particles and extended structures</div>
+          </div>
+          <div id="graph3d" class="graph-container"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standard Model -->
+  <section id="standard-model">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Standard Model via Origami</div>
+        <div class="section-tagline">
+          How the universal equation generates every particle configuration.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Particle-by-particle mapping</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Origami construction of Standard Model particles</div>
+      <div class="card-subtitle">
+        Each particle is a specific pattern of folds, hinges, and moving points.
+      </div>
+
+      <div class="two-column">
+        <div>
+          <p style="font-size:0.9rem;color:var(--muted);">
+            In the <strong>thisone(1)</strong> paper, the universal equation is shown to
+            generate a full basis of geometric configurations. Subsequent work identifies
+            a subset of these configurations that correspond to the Standard Model:
+          </p>
+          <ul style="list-style:none;font-size:0.85rem;color:var(--muted);margin-top:0.4rem;display:grid;gap:0.25rem;">
+            <li>• <strong>Quarks:</strong> triple-fold tubes with color-coded hinge angles.</li>
+            <li>• <strong>Leptons:</strong> simpler circular tubes with constrained curvature.</li>
+            <li>• <strong>Gauge bosons:</strong> propagating fold waves along the surface \(\Sigma\).</li>
+            <li>• <strong>Higgs:</strong> uniform expansion/contraction mode of the origami surface.</li>
+          </ul>
+          <p style="font-size:0.85rem;color:var(--muted);margin-top:0.4rem;">
+            The universal equation encodes these as distinct solutions \(\Phi_i\) and
+            \(\mathcal{F}\) with symmetry constraints matching the Standard Model gauge
+            group and mass spectrum.
+          </p>
+        </div>
+
+        <div class="paper-table-wrapper">
+          <table>
+            <thead>
+            <tr>
+              <th>Particle</th>
+              <th>Origami Pattern</th>
+              <th>Key Parameters</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Up quark</td>
+              <td>Triple tube fold</td>
+              <td>Color angle set, chirality hinge</td>
+            </tr>
+            <tr>
+              <td>Electron</td>
+              <td>Single circular tube</td>
+              <td>Curvature radius, spin twist</td>
+            </tr>
+            <tr>
+              <td>Photon</td>
+              <td>Fold wave along \(\Sigma\)</td>
+              <td>Amplitude, polarization fold</td>
+            </tr>
+            <tr>
+              <td>Higgs boson</td>
+              <td>Global breathing mode</td>
+              <td>Surface expansion factor</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cosmology -->
+  <section id="cosmology">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Big Bang & Inflation</div>
+        <div class="section-tagline">
+          Universe history as a sequence of global folds and local particle creation.
+        </div>
+      </div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>From initial fold to present structures</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cosmological timeline in Quantum Origami</div>
+      <div class="card-subtitle">
+        Each epoch corresponds to a distinct regime of the universal equation.
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Initial Origami Surface (Big Bang)</div>
+          <div class="timeline-body">
+            A highly symmetric, nearly flat \(\Sigma\) with intense fold energy concentrated
+            at a single global event—seed of all later structures.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Inflationary Fold Expansion</div>
+          <div class="timeline-body">
+            Rapid expansion of \(\Sigma\) driven by a dominant fold mode, smoothing curvature
+            while seeding small variations that become large-scale structure.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Particle Formation</div>
+          <div class="timeline-body">
+            Localized tubes and circular particles emerge as moving points and hinges
+            settle into stable configurations—realizing the Standard Model spectrum.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">Structure Formation</div>
+          <div class="timeline-body">
+            Large-scale folds and clustering of tubes generate galaxies, stars, and
+            macroscopic structures, all governed by the same universal equation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      Quantum Origami Portal · All theory sections linked above · Customize equations and
+      particle mappings directly in this single file.
+    </div>
+    <div class="footer-links">
+      <a href="#overview">Overview</a>
+      <a href="#universal-equation">Universal Equation</a>
+      <a href="#papers">Papers</a>
+      <a href="#graphs">Graphs</a>
+      <a href="#standard-model">Standard Model</a>
+      <a href="#cosmology">Cosmology</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Simple sortable table for papers
+  (function () {
+    const table = document.getElementById("paperTable");
+    if (!table) return;
+    const headers = table.querySelectorAll("th[data-key]");
+    let sortState = {};
+
+    headers.forEach((th) => {
+      th.addEventListener("click", () => {
+        const key = th.getAttribute("data-key");
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const ascending = !sortState[key];
+
+        rows.sort((a, b) => {
+          const ta = a.querySelector(`td:nth-child(${th.cellIndex + 1})`).innerText.trim().toLowerCase();
+          const tb = b.querySelector(`td:nth-child(${th.cellIndex + 1})`).innerText.trim().toLowerCase();
+          if (ta < tb) return ascending ? -1 : 1;
+          if (ta > tb) return ascending ? 1 : -1;
+          return 0;
+        });
+
+        rows.forEach((r) => tbody.appendChild(r));
+        sortState = { [key]: ascending };
+      });
+    });
+  })();
+
+  // Plotly graphs: 2D folds and 3D tubes
+  function render2DGraph() {
+    const x = [0, 1, 2, 3, 4];
+    const y = [0, 1, 0.5, 1.5, 1];
+    const trace = {
+      x,
+      y,
+      mode: "lines+markers",
+      line: { color: "#4fd1c5", width: 3 },
+      marker: { color: "#ff6ec7", size: 8 },
+      name: "Fold hinge path"
+    };
+    const layout = {
+      paper_bgcolor: "#050816",
+      plot_bgcolor: "#050816",
+      font: { color: "#f8f9ff" },
+      xaxis: { title: "Base point parameter λ", gridcolor: "#1f2933" },
+      yaxis: { title: "Fold angle / displacement", gridcolor: "#1f2933" },
+      margin: { l: 40, r: 10, t: 30, b: 40 },
+      showlegend: false
+    };
+    Plotly.newPlot("graph2d", [trace], layout, { displayModeBar: false });
+  }
+
+  function render3DTube() {
+    const theta = [];
+    const z = [];
+    const r = 1;
+    const x = [];
+    const y = [];
+    for (let i = 0; i < 200; i++) {
+      const t = (i / 199) * 4 * Math.PI;
+      theta.push(t);
+      const zz = (i / 199) * 4 - 2;
+      z.push(zz);
+      x.push(r * Math.cos(t));
+      y.push(r * Math.sin(t));
     }
 
-    function drawBackground() {
-      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      grad.addColorStop(0, "#ffffff");
-      grad.addColorStop(1, "#ffd166");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const trace = {
+      x,
+      y,
+      z,
+      mode: "lines",
+      line: { color: "#ffd166", width: 4 },
+      type: "scatter3d",
+      name: "Tube trajectory"
+    };
+
+    const layout = {
+      paper_bgcolor: "#050816",
+      scene: {
+        xaxis: { title: "x", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        yaxis: { title: "y", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        zaxis: { title: "z", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        bgcolor: "#050816"
+      },
+      margin: { l: 0, r: 0, t: 0, b: 0 },
+      showlegend: false
+    };
+
+    Plotly.newPlot("graph3d", [trace], layout, { displayModeBar: false });
+  }
+
+  // Particle configuration mode: modify graphs slightly
+  function renderParticleMode() {
+    // 2D: radial profile
+    const r = [];
+    const angle = [];
+    for (let i = 0; i < 100; i++) {
+      const a = (i / 99) * 2 * Math.PI;
+      angle.push(a);
+      r.push(1 + 0.2 * Math.sin(3 * a));
+    }
+    const x2 = r.map((rv, i) => rv * Math.cos(angle[i]));
+    const y2 = r.map((rv, i) => rv * Math.sin(angle[i]));
+
+    const trace2d = {
+      x: x2,
+      y: y2,
+      mode: "lines",
+      line: { color: "#63b3ed", width: 3 },
+      name: "Particle cross-section"
+    };
+    const layout2d = {
+      paper_bgcolor: "#050816",
+      plot_bgcolor: "#050816",
+      font: { color: "#f8f9ff" },
+      xaxis: { title: "x", gridcolor: "#1f2933" },
+      yaxis: { title: "y", gridcolor: "#1f2933" },
+      margin: { l: 40, r: 10, t: 30, b: 40 },
+      showlegend: false
+    };
+    Plotly.newPlot("graph2d", [trace2d], layout2d, { displayModeBar: false });
+
+    // 3D: localized blob
+    const phi = [];
+    const theta3 = [];
+    const x3 = [];
+    const y3 = [];
+    const z3 = [];
+    for (let i = 0; i < 200; i++) {
+      const p = Math.acos(2 * Math.random() - 1);
+      const t = 2 * Math.PI * Math.random();
+      const rr = 0.6 + 0.2 * Math.random();
+      phi.push(p);
+      theta3.push(t);
+      x3.push(rr * Math.sin(p) * Math.cos(t));
+      y3.push(rr * Math.sin(p) * Math.sin(t));
+      z3.push(rr * Math.cos(p));
     }
 
-    function randomColor() {
-      const colors = ["#ff6f61", "#06d6a0", "#118ab2", "#ffd166", "#f7f7ff"];
-      return colors[Math.floor(Math.random() * colors.length)];
+    const trace3d = {
+      x: x3,
+      y: y3,
+      z: z3,
+      mode: "markers",
+      marker: { color: "#ff6ec7", size: 3 },
+      type: "scatter3d",
+      name: "Particle cloud"
+    };
+
+    const layout3d = {
+      paper_bgcolor: "#050816",
+      scene: {
+        xaxis: { title: "x", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        yaxis: { title: "y", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        zaxis: { title: "z", gridcolor: "#1f2933", zerolinecolor: "#1f2933" },
+        bgcolor: "#050816"
+      },
+      margin: { l: 0, r: 0, t: 0, b: 0 },
+      showlegend: false
+    };
+
+    Plotly.newPlot("graph3d", [trace3d], layout3d, { displayModeBar: false });
+  }
+
+  // Tab switching
+  (function () {
+    const tabs = document.querySelectorAll(".tab");
+    function setMode(mode) {
+      tabs.forEach((t) => t.classList.toggle("active", t.getAttribute("data-mode") === mode));
+      if (mode === "2d") {
+        render2DGraph();
+        render3DTube();
+      } else if (mode === "3d") {
+        render2DGraph();
+        render3DTube();
+      } else if (mode === "particle") {
+        renderParticleMode();
+      }
     }
 
-    function spawnShape(x, y) {
-      const size = 20 + Math.random() * 60;
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(Math.random() * Math.PI * 2);
-      ctx.fillStyle = randomColor();
-      ctx.beginPath();
-      // Simple folded diamond shape
-      ctx.moveTo(0, -size);
-      ctx.lineTo(size, 0);
-      ctx.lineTo(0, size);
-      ctx.lineTo(-size, 0);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    }
-
-    canvas.addEventListener("click", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      spawnShape(x, y);
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const mode = tab.getAttribute("data-mode");
+        setMode(mode);
+      });
     });
 
-    document.getElementById("randomColorsBtn").addEventListener("click", () => {
-      drawBackground();
-    });
-
-    document.getElementById("spawnShapeBtn").addEventListener("click", () => {
-      const x = canvas.width * (0.2 + 0.6 * Math.random());
-      const y = canvas.height * (0.2 + 0.6 * Math.random());
-      spawnShape(x, y);
-    });
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    // ---------- THREE.JS: simple rotating cube ----------
-    const container = document.getElementById("three-container");
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1020);
-
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      container.clientWidth / container.clientHeight,
-      0.1,
-      100
-    );
-    camera.position.set(2.5, 2.5, 3.5);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
-
-    const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-    const materials = [
-      new THREE.MeshPhongMaterial({ color: 0xff6f61 }),
-      new THREE.MeshPhongMaterial({ color: 0x06d6a0 }),
-      new THREE.MeshPhongMaterial({ color: 0xffd166 }),
-      new THREE.MeshPhongMaterial({ color: 0x118ab2 }),
-      new THREE.MeshPhongMaterial({ color: 0xf7f7ff }),
-      new THREE.MeshPhongMaterial({ color: 0x1b1f3b }),
-    ];
-    const cube = new THREE.Mesh(geometry, materials);
-    scene.add(cube);
-
-    const light = new THREE.PointLight(0xffffff, 1.2);
-    light.position.set(5, 5, 5);
-    scene.add(light);
-
-    const ambient = new THREE.AmbientLight(0x404040);
-    scene.add(ambient);
-
-    function animate() {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.015;
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener("resize", () => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    });
-  </script>
+    // Initial render
+    setMode("2d");
+  })();
+</script>
 </body>
 </html>
